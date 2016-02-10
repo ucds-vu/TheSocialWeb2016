@@ -4,8 +4,8 @@ import requests
 import facebook 
 import json
 
-ACCESS_TOKEN=''
-g = facebook.GraphAPI(ACCESS_TOKEN)
+token=''
+g = facebook.GraphAPI(token)
 
 
 friends = [ (friend['id'], friend['name'],)

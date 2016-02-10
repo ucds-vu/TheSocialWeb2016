@@ -19,7 +19,7 @@ Make sure to start your virtual environment (e.g. use $ source socialEnv/bin/act
 For these exercises you have to register as a Facebook Developer. You can do this by going to https://developers.facebook.com/. Click on apps and ‘Register as developer’ and accept the terms. You can just continue without providing details. Get the user access token by following these steps:
 
 - Go to the Graph API Explorer page: https://developers.facebook.com/tools/explorer
-- Press the "Get Access Token" button to open an overlay window.
+- Press "Get Token", then "Get User Access Token"  to open an overlay window.
 - Check the "user_friends" box to set permission for retrieving your friend list. Click "Get Access Token".
 - Check your query by building it with the visual editor on the left side of the page. From the tree view, search and add field "friends", and then "likes" as a child of "friends". Click "Submit" to view the results of your query.
 - Copy your access token from the text box at the top of the page to use in your code.
