@@ -1,9 +1,9 @@
 *****************************************************
-*  The Social Web 				                    *
-*  2015-2016 Master Information Sciences	        *
+*  The Social Web                                   *
+*  2015-2016 Master Information Sciences            *
 *  Instructors Davide Ceolin, Anca Dumitrache,      *
-*  and Niels Ockeloen                	            *
-*						                            *
+*  and Niels Ockeloen                               *
+*                                                   *
 *  Exercises for Hands-on session 2                 *
 *  11 February 2016 09:00 - 10:45                   *
 *  WN-F153 (L) WN-S345                              *
