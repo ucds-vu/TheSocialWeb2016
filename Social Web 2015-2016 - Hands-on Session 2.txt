@@ -37,7 +37,7 @@ Facebook has different query APIs, such as REST APIs (http://developers.facebook
 
 Exercise 1: Gaining access to your Facebook account and query for information (based on Example 2-2 and 2-5 in Mining the Social Web). 
 
-Copy the code you find in https://raw.githubusercontent.com/VU-Amsterdam-Web-Media-Group/TheSocialWeb2016/master/scripts/HandsOn2Exercise1.txt to a plain text document, and replace ACCESS_TOKEN with your user access token. Call the file facebook_graph_query.py and invoke it on the bash:
+Copy the code you find in https://raw.githubusercontent.com/VU-Amsterdam-Web-Media-Group/TheSocialWeb2016/master/scripts/HandsOn2Exercise1.txt to a plain text document, and replace token with your user access token. Call the file facebook_graph_query.py and invoke it on the bash:
 $ python facebook_graph_query.py
 The output of facebook_graph_query.py retrieves information about yourself, your friends and searches for pages mentioning the UVA and VU. Invoking this script will show results but in the end returns an error. We are going to solve this in the next exercise.
 
@@ -50,14 +50,14 @@ Task 2: Read the documentation of the Facebook Graph API and see if you can retr
 
 Exercise 3: Analyzing things your friends ‘like’ (based on Example 2-7, 2-8 and 2-9 in Mining the Social Web)
 
-Copy the code you find in https://raw.githubusercontent.com/VU-Amsterdam-Web-Media-Group/TheSocialWeb2016/master/scripts/HandsOn2Exercise2.txt to a plain text document, and add your Facebook ACCESS_TOKEN again (refresh if expired). Call the file facebook_calculate_likes.py and invoke it on the bash:
+Copy the code you find in https://raw.githubusercontent.com/VU-Amsterdam-Web-Media-Group/TheSocialWeb2016/master/scripts/HandsOn2Exercise2.txt to a plain text document, and add your Facebook token again (refresh if expired). Call the file facebook_calculate_likes.py and invoke it on the bash:
 $ python facebook_calculate_likes.py
 
 
 The initial output is a python dictionary, which is hard to read. Make ‘print likes’ a comment by adding a # in front and uncomment the other print statements, to get aggregate tables. Figure out how these tables are generated.
 
 
-Exercise 4: Visualising a graph of mutual friendships (based on Example 2-13 in Mining the Social Web) In this final example, you're going to visualise your entire network and check which of your friends are mutual friends. You can find the code to create a graph at https://raw.githubusercontent.com/VU-Amsterdam-Web-Media-Group/TheSocialWeb2016/master/scripts/HandsOn2Exercise3.txt. Add the ACCESS_TOKEN and save this script as facebook_friends_graph.py. Create a viz folder in your working directory. When you run this script it will output a force.json file in the viz folder.
+Exercise 4: Visualising a graph of mutual friendships (based on Example 2-13 in Mining the Social Web) In this final example, you're going to visualise your entire network and check which of your friends are mutual friends. You can find the code to create a graph at https://raw.githubusercontent.com/VU-Amsterdam-Web-Media-Group/TheSocialWeb2016/master/scripts/HandsOn2Exercise3.txt. Add the token and save this script as facebook_friends_graph.py. Create a viz folder in your working directory. When you run this script it will output a force.json file in the viz folder.
 
 -------------------------------------------------------------------------------
 Optional Task: Can you modify the graph such that it writes something other than your friends' names as node labels. For example their locations? Can you use different colours for connections between you and male friends and female friends?
