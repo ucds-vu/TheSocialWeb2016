@@ -18,7 +18,7 @@ mutual_friends = {}
 # This loop spawns a separate request for each iteration, so
 # it may take a while.
 for friend_id, friend_name in friends:
-    r = requests.get(url % (friend_id, ACCESS_TOKEN,) )
+    r = requests.get(url % (friend_id, token,) )
     print json.loads(r.content)
     response_data = json.loads(r.content)['context']['mutual_friends']['data']
     mutual_friends[friend_name] = [ data['name']
