@@ -351,4 +351,4 @@ So far, we have been basing recommendations on the full data set, obviously this
 itemsim=recommendations.calculateSimilarItems(recommendations.critics)
 recommendations.getRecommendedItems(recommendations.critics,itemsim,'Toby')
 
-You can use the code from the Computational Intelligence book on “Building the Item Comparison Dataset” (pages 23-25), https://www.dropbox.com/s/c7lp83xk0uanpu7/Handson4-Building-Item-Comparison-Dataset.pdf?dl=0
+You can use the code from the Computational Intelligence book on “Building the Item Comparison Dataset” (pages 23-25), https://github.com/VU-Amsterdam-Web-Media-Group/TheSocialWeb2016/blob/master/lib/Handson4-Building-Item-Comparison-Dataset.pdf
