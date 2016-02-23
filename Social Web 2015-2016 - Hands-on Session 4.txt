@@ -1,0 +1,354 @@
+*****************************************************
+*  The Social Web                                   *
+*  2015-2016 Master Information Sciences            *
+*  Instructors Davide Ceolin, Anca Dumitrache,      *
+*  and Niels Ockeloen                               *
+*                                                   *
+*  Exercises for Hands-on session 4                 *
+*  11 February 2016 09:00 - 10:45                   *
+*  WN-F153 (L) WN-S345                              *
+*****************************************************
+
+Required packages:
+- feedparser
+
+
+For Exercises 1 -3 you will need to save the script recommendations.py (from Programming Collaborative Intelligence) : 
+
+# -*- coding: utf-8 -*-
+
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+from math import sqrt
+# A dictionary of movie critics and their ratings of a small set of movies
+critics = {
+    'Lisa Rose': {
+        'Lady in the Water': 2.5,
+        'Snakes on a Plane': 3.5,
+        'Just My Luck': 3.0,
+        'Superman Returns': 3.5,
+        'You, Me and Dupree': 2.5,
+        'The Night Listener': 3.0,
+    },
+    'Gene Seymour': {
+        'Lady in the Water': 3.0,
+        'Snakes on a Plane': 3.5,
+        'Just My Luck': 1.5,
+        'Superman Returns': 5.0,
+        'The Night Listener': 3.0,
+        'You, Me and Dupree': 3.5,
+    },
+    'Michael Phillips': {
+        'Lady in the Water': 2.5,
+        'Snakes on a Plane': 3.0,
+        'Superman Returns': 3.5,
+        'The Night Listener': 4.0,
+    },
+    'Claudia Puig': {
+        'Snakes on a Plane': 3.5,
+        'Just My Luck': 3.0,
+        'The Night Listener': 4.5,
+        'Superman Returns': 4.0,
+        'You, Me and Dupree': 2.5,
+    },
+    'Mick LaSalle': {
+        'Lady in the Water': 3.0,
+        'Snakes on a Plane': 4.0,
+        'Just My Luck': 2.0,
+        'Superman Returns': 3.0,
+        'The Night Listener': 3.0,
+        'You, Me and Dupree': 2.0,
+    },
+    'Jack Matthews': {
+        'Lady in the Water': 3.0,
+        'Snakes on a Plane': 4.0,
+        'The Night Listener': 3.0,
+        'Superman Returns': 5.0,
+        'You, Me and Dupree': 3.5,
+    },
+    'Toby': {'Snakes on a Plane': 4.5, 'You, Me and Dupree': 1.0,
+             'Superman Returns': 4.0},
+}
+
+
+def sim_distance(prefs, p1, p2):
+    '''
+    Returns a distance-based similarity score for person1 and person2.
+    '''
+
+    # Get the list of shared_items
+    si = {}
+    for item in prefs[p1]:
+        if item in prefs[p2]:
+            si[item] = 1
+    # If they have no ratings in common, return 0
+    if len(si) == 0:
+        return 0
+    # Add up the squares of all the differences
+    sum_of_squares = sum([pow(prefs[p1][item] - prefs[p2][item], 2) for item in
+                         prefs[p1] if item in prefs[p2]])
+    return 1 / (1 + sum_of_squares)
+
+
+def sim_pearson(prefs, p1, p2):
+    '''
+    Returns the Pearson correlation coefficient for p1 and p2.
+    '''
+
+    # Get the list of mutually rated items
+    si = {}
+    for item in prefs[p1]:
+        if item in prefs[p2]:
+            si[item] = 1
+    # If they are no ratings in common, return 0
+    if len(si) == 0:
+        return 0
+    # Sum calculations
+    n = len(si)
+    # Sums of all the preferences
+    sum1 = sum([prefs[p1][it] for it in si])
+    sum2 = sum([prefs[p2][it] for it in si])
+    # Sums of the squares
+    sum1Sq = sum([pow(prefs[p1][it], 2) for it in si])
+    sum2Sq = sum([pow(prefs[p2][it], 2) for it in si])
+    # Sum of the products
+    pSum = sum([prefs[p1][it] * prefs[p2][it] for it in si])
+    # Calculate r (Pearson score)
+    num = pSum - sum1 * sum2 / n
+    den = sqrt((sum1Sq - pow(sum1, 2) / n) * (sum2Sq - pow(sum2, 2) / n))
+    if den == 0:
+        return 0
+    r = num / den
+    return r
+
+
+def topMatches(
+    prefs,
+    person,
+    n=5,
+    similarity=sim_pearson,
+):
+    '''
+    Returns the best matches for person from the prefs dictionary. 
+    Number of results and similarity function are optional params.
+    '''
+
+    scores = [(similarity(prefs, person, other), other) for other in prefs
+              if other != person]
+    scores.sort()
+    scores.reverse()
+    return scores[0:n]
+
+
+def getRecommendations(prefs, person, similarity=sim_pearson):
+    '''
+    Gets recommendations for a person by using a weighted average
+    of every other user's rankings
+    '''
+
+    totals = {}
+    simSums = {}
+    for other in prefs:
+    # Don't compare me to myself
+        if other == person:
+            continue
+        sim = similarity(prefs, person, other)
+    # Ignore scores of zero or lower
+    	if sim <= 0: 
+    		continue
+    	for item in prefs[other]:
+        	# Only score movies I haven't seen yet
+        	if item not in prefs[person] or prefs[person][item] == 0:
+        		# Similarity * Score
+            		totals.setdefault(item, 0)
+            		# The final score is calculated by multiplying each item by the
+            		#   similarity and adding these products together
+            		totals[item] += prefs[other][item] * sim
+            		# Sum of similarities
+            		simSums.setdefault(item, 0)
+            		simSums[item] += sim
+    # Create the normalized list
+    rankings = [(total / simSums[item], item) for (item, total) in
+                totals.items()]
+    # Return the sorted list
+    rankings.sort()
+    rankings.reverse()
+    return rankings
+
+
+def transformPrefs(prefs):
+    '''
+    Transform the recommendations into a mapping where persons are described
+    with interest scores for a given title e.g. {title: person} instead of
+    {person: title}.
+    '''
+
+    result = {}
+    for person in prefs:
+        for item in prefs[person]:
+            result.setdefault(item, {})
+            # Flip item and person
+            result[item][person] = prefs[person][item]
+    return result
+
+----------------------------------------------------------------------------
+Exercise 1: Finding Similar Users
+In recommendations.py you see two different similarity metrics: Euclidean distance and the Pearson correlation. If you've done an Information Retrieval course, you've probably heard of these. If not, look them up. 
+
+To find similar users in your little movie data set, you can fire up the following commands in your python interpreter:
+
+>>> import recommendations # make sure recommendations.py is in the directory you're working in now
+>>> recommendations.sim_distance(recommendations.critics,'Lisa Rose','Gene Seymour') # get the distance between 'Lisa Rose' and 'Gene Seymour'
+0.148148148148 # expected output
+
+Try this with other names so you can see who is closer or further.
+
+A slightly more sophisticated distance measure is the Pearson correlation. You can find the distance between 'Lisa Rose' and 'Gene Seymour' through:
+
+>>> recommendations.sim_pearson(recommendations.critics,'Lisa Rose','Gene Seymour')
+0.396059017191 # expected answer
+
+You can also rank people according to how close they are. For this you have the topMatches function in recommendations.py
+
+>>> recommendations.topMatches(recommendations.critics,'Toby',n=3)
+
+----------------------------------------------------------------------------
+Task 1: Also create a topMatches function that uses the Euclidean distance. Try it with other names and see if you find differences between the two measures, do you get different rankings with Euclidean? 
+----------------------------------------------------------------------------
+
+Exercise 2: Recommending Items
+
+Finding similar persons is interesting, but of course you're more interested in finding interesting movies for a user. This is what the getRecommendations function does. For example, get recommendations for 'Toby' you can call: 
+
+>>> recommendations.getRecommendations(recommendations.critics,'Toby')
+[(3.3477895267131013, 'The Night Listener'), (2.8325499182641614, 'Lady in the Water'), (2.5309807037655645, 'Just My Luck')] # example output
+>>> recommendations.getRecommendations(recommendations.critics,'Toby', similarity=recommendations.sim_distance)
+[(3.5002478401415877, 'The Night Listener'), (2.7561242939959363, 'Lady in the Water'), (2.4619884860743739, 'Just My Luck')] # example output
+
+Note that the output does not only consist of a movie title, but also a guess at what the user's rating for each movie would be. 
+
+----------------------------------------------------------------------------
+Task 2: Can you also find out how to give information on how the recommendation is built up. For example about the 'closest' person that also watched this movie?
+----------------------------------------------------------------------------  
+
+Exercise 3: In Exercise 2, you have been building recommendations based on similar users, but you could of course also build recommendations based on similar items. In this exercise you will do this. 
+
+The function is essentially the same, but you need to transfer your data, from:
+
+  {'Lisa Rose': {'Lady in the Water': 2.5, 'Snakes on a Plane': 3.5},
+    'Gene Seymour': {'Lady in the Water': 3.0, 'Snakes on a Plane': 3.5}}
+to:
+  {'Lady in the Water':{'Lisa Rose':2.5,'Gene Seymour':3.0},
+'Snakes on a Plane':{'Lisa Rose':3.5,'Gene Seymour':3.5}}
+
+This is what the transformPrefs function does. 
+
+You can now create a dictionary for movies with their scores assigned by different people by invoking:
+>>> movies=recommendations.transformPrefs(recommendations.critics)
+
+And find similar items for a particular movie like this:
+>>> recommendations.topMatches(movies,'Superman Returns')
+[(0.657, 'You, Me and Dupree'), (0.487, 'Lady in the Water'), (0.111, 'Snakes on a Plane'), (-0.179, 'The Night Listener'), (-0.422, 'Just My Luck')] # example output
+
+Or find people who may like a particular movie:
+
+>> recommendations.getRecommendations(movies,'Just My Luck') 
+[(4.0, 'Michael Phillips'), (3.0, 'Jack Matthews')] # example output
+
+----------------------------------------------------------------------------
+Task 3: Try to follow exactly what is going on in the last call. Notice that Michael and Jack did not rate 'Just my Luck'. How is their rating for it built up?
+----------------------------------------------------------------------------  
+
+ 
+Exercise 4: Building a del.icio.us Link Recommender (from Programming Collective Intelligence by Toby Segaran)
+
+Install the pydelicious library:
+> easy_install pydelicious
+
+Save the following code as deliciousrec.py
+
+# -*- coding: utf-8 -*-
+
+from pydelicious import get_popular,get_userposts,get_urlposts
+import time
+
+def initializeUserDict(tag,count=5):
+  user_dict={}
+  # get the top count' popular posts
+  for p1 in get_popular(tag=tag)[0:count]:
+    # find all users who posted this
+    for p2 in get_urlposts(p1['url']):
+      user=p2['user']
+      # do not add when no user id
+      if user:
+        user_dict[user]={}
+  return user_dict
+
+def fillItems(user_dict):
+  all_items={}
+  # Find links posted by all users
+  for user in user_dict:
+    for i in range(3):
+      try:
+        posts=get_userposts(user)
+        break
+      except:
+        print "Failed user "+user+", retrying"
+        time.sleep(4)
+    for post in posts:
+      url=post['url']
+      user_dict[user][url]=1.0
+      all_items[url]=1
+  
+  # Fill in missing items with 0
+  for ratings in user_dict.values():
+    for item in all_items:
+      if item not in ratings:
+        ratings[item]=0.0	
+----------------------------------------------------------------------------	
+
+
+You can get a list of popular recent posts about programming by invoking:
+
+>>> import pydelicious
+>>> pydelicious.get_popular(tag='programming')
+[{'count': '', 'extended': '', 'hash': '', 'description': u'How To Write Unmaintainable Code', 'tags': '', 'href': u'http://thc.segfault.net/root/phun/ unmaintain.html', 'user': u'dorsia', 'dt': u'2006-08-19T09:48:56Z'}, {'count': '', 'extended': '', 'hash': '', 'description': u'Threading in C#', 'tags': '', 'href': u'http://www.albahari.com/threading/', 'user': u'mmihale', 'dt': u'2006-05-17T18:09: 24Z'},
+…etc…   # example output
+
+To automatically create a data set of delicious users similar to the movie watchers you can invoke the initializeUserDict function in deliciousrec.py 
+
+>>> from deliciousrec import *
+>>> delusers=initializeUserDict('programming') # or for any other tag really
+
+Now initializeUserDict has only created the user keys. We of course also want to know what pages they added to their bookmarks. You can pull those in through:
+
+>>> fillItems(delusers)
+
+When the API blocks requests, your script will pause and retry up to three times for a user. This may take a few minutes. Use this time to review what is going on in the code. Notice that users don't give ratings to delicious bookmarks, there is only a "user has this page" or "user doesn't have this page" which results in a rating of 1 or 0. 
+
+To recommend a similar user, we can use our first script (recommendations.py) again. 
+
+First choose a random user for whom you're going to find neighbours
+>>> import random
+>>> user=delusers.keys()[random.randint(0,len(delusers)-1)] 
+>>> user # print the username 
+u'veza' # sample output
+>> recommendations.topMatches(delusers,user) # from all delicioususers, get the most similar to user
+[(0.083, u'kuzz99'), (0.083, u'arturoochoa'), (0.083, u'NickSmith'), (0.083, u'MichaelDahl'), (0.050, u'zinggoat')] # sample output
+
+----------------------------------------------------------------------------
+Task 4: Recommend pages for a user based on what similar users have bookmarked. 
+Recommend pages for a user based on similar items in his/her bookmark set. 
+---------------------------------------------------------------------------- 
+
+----------------------------------------------------------------------------
+Task 5: Reuse the data and scripts you have created in hands-on session 2 to build a recommender for your Facebook friends. Can you get page recommendations from your friends? What other things would be interesting to recommend? 
+----------------------------------------------------------------------------
+   
+
+For those who are considering using recommendations further:
+So far, we have been basing recommendations on the full data set, obviously this is a bad idea if you have a big data set. You can prune your dataset by first computing similar items. The code to do so is already in recommendations.py and you can work with it as follows:
+itemsim=recommendations.calculateSimilarItems(recommendations.critics)
+recommendations.getRecommendedItems(recommendations.critics,itemsim,'Toby')
+
+You can use the code from the Computational Intelligence book on “Building the Item Comparison Dataset” (pages 23-25), https://www.dropbox.com/s/c7lp83xk0uanpu7/Handson4-Building-Item-Comparison-Dataset.pdf?dl=0
