@@ -5,7 +5,7 @@
 *  and Niels Ockeloen                               *
 *                                                   *
 *  Exercises for Hands-on session 4                 *
-*  11 February 2016 09:00 - 10:45                   *
+*  25 February 2016 09:00 - 10:45                   *
 *  WN-F153 (L) WN-S345                              *
 *****************************************************
 
