@@ -360,8 +360,8 @@ u'CrossFeet' # sample output
  (0.5617842973785171, u'rlt3')] # sample output
 
 ----------------------------------------------------------------------------
-Task 4: Recommend pages for a user based on what similar users have bookmarked. 
-Recommend pages for a user based on similar items in his/her bookmark set. 
+Task 4: Recommend subreddits for a user based on what subreddits similar users have commented in.
+Recommend posts for a user based on posts they have commented on. 
 ---------------------------------------------------------------------------- 
 
 ----------------------------------------------------------------------------

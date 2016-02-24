@@ -1,0 +1,434 @@
+*****************************************************
+*  The Social Web 				    *
+*  2015-2016 Master Information Sciences	    *
+*  Instructors Davide Ceolin, Anca Dumitrache,   *
+*  and Niels Ockeloen                	            *
+*						    *
+*  Exercises for Hands-on session 1		    *
+*  4 February 2016 09:00 - 10:45                    *
+*  WN-F153 (L) WN-P345                              *
+*****************************************************
+
+
+BEFORE INSTALLING PACKAGES: SET UP YOUR PYTHON VIRTUAL ENVIRONMENT!! SEE THE HANDS ON STARETING GUIDE.
+
+Prerequisites:
+- Python 2.7
+- Python packages: twitter, prettytable, numpy (SEE BELOW), python-dateutil, pyparsing, matplotlib
+
+
+===================== Installing numpy package on Windows ===============
+NB: On the WINDOWS machines only, you will have to install a precompiled version of the numpy package. 
+Please still stick to the package installation order above. 
+To install numpy on the VU Windows machines, use the following commands:
+
+> curl -O http://www.few.vu.nl/~con220/socialweb/numpy-1.8.2+mkl-cp27-none-win32.whl
+> pip install numpy-1.8.2+mkl-cp27-none-win32.whl
+
+NB2: This is a 32-bits version targeted for the VU Windows Lab computers. If you need a different version for your own Windows Machine, e.g. 64 bits or different Python version, you can download the package from:
+http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
+Download the needed numpy-1.8.2 package directly from the website, place it in your working folder and 'pip install' it using its file name.
+=========================================================================
+
+
+NOTE1: All python script lines are placed in script blocks designated by =[START SCRIPT]=== and =[END SCRIPT]=== marker lines.
+NOTE2: Identation has a functianal meaning in python scripts, so be carefull with it. The examples in this file use four spaces for one identation step. Using tabs can be tricky and result in indentation errors.
+
+
+First you need to know how to retrieve some social web data. Exercises 1 and 2 will show you how to retrieve trends and search results from Twitter. 
+
+Exercise 1: Authorizing an application to access Twitter account data (from Example 1-1/9-1 in Mining the Social Web):
+
+################# TO DO BEFORE STARTING!!! ##############################
+# Go to https://apps.twitter.com/ and sign in with a twitter account    #
+# to create an app and get values for the credentials mentioned below,  #
+# which you'll need to provide in place of the empty string values that #
+# are defined as placeholders. If you don't have a Twitter account,     #
+# create one first. NB: YOU WILL HAVE TO REGISTER YOUR MOBILE PHONE     #
+# NUMBER IN YOUR PROFILE BEFORE YOU CAN CREATE AN APP.                  #
+#########################################################################
+
+After creating the app, click 'manage keys and access tokens' on the resulting page. 
+
+
+=======[START SCRIPT]==========================================================
+
+import twitter # Tell Python to use the twitter package
+CONSUMER_KEY = ''
+CONSUMER_SECRET = ''
+OAUTH_TOKEN = '' # to get the oauth credential you need to click on the 'Create my access token' button and wait few moments
+OAUTH_TOKEN_SECRET = ''
+auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET,CONSUMER_KEY, CONSUMER_SECRET)
+twitter_api = twitter.Twitter(auth=auth)
+print twitter_api # Nothing to see by displaying twitter_api except that it's now a defined variable
+
+=======[END SCRIPT]============================================================
+
+
+
+Exercise 2: Retrieving twitter search trends (from Example 1-2/9-2 in Mining the Social Web):
+
+=======[START SCRIPT]==========================================================
+
+WORLD_WOE_ID = 1 # The Yahoo! Where On Earth ID for the entire world
+world_trends = twitter_api.trends.place(_id=WORLD_WOE_ID) # get back a callable
+print world_trends
+
+=======[END SCRIPT]============================================================
+
+
+
+Your output should look like something like this:
+[{u'created_at': u'2014-01-22T13:52:40Z', u'trends': [{u'url': u'http://twitter.com/search?q=%22Iqbal+CJR%22', u'query': u'%22Iqbal+CJR%22', u'name': u'Iqbal CJR', u'promoted_content': None, u'events': None}, {u'url': u'http://twitter.com/search?q=%23QueremosP9NaEliana', u'query': u'%23QueremosP9NaEliana', u'name': u'#QueremosP9NaEliana', u'promoted_content': None, u'events': None}, {u'url': u'http://twitter.com/search?q=%23PresidenSobatIndonesia', u'query': u'%23PresidenSobatIndonesia', u'name': u'#PresidenSobatIndonesia', u'promoted_content': None, u'events': None}, {u'url': u'http://twitter.com/search?q=%23CrushKitaKaso', u'query': u'%23CrushKitaKaso', u'name': u'#CrushKitaKaso', u'promoted_content': None, u'events': None}, {u'url': u'http://twitter.com/search?q=%233FlasherNobitaNioners', u'query': u'%233FlasherNobitaNioners', u'name': u'#3FlasherNobitaNioners', u'promoted_content': None, u'events': None}, {u'url': u'http://twitter.com/search?q=%23bagasrdsREPLY', u'query': u'%23bagasrdsREPLY', u'name': u'#bagasrdsREPLY', u'promoted_content': None, u'events': None}, {u'url': u'http://twitter.com/search?q=%22Warna+HPmu%22', u'query': u'%22Warna+HPmu%22', u'name': u'Warna HPmu', u'promoted_content': None, u'events': None}, {u'url': u'http://twitter.com/search?q=%22AkDe%C4%9Fil+Karanl%C4%B1k%C4%B0%C5%9FlerinPartisi%22', u'query': u'%22AkDe%C4%9Fil+Karanl%C4%B1k%C4%B0%C5%9FlerinPartisi%22', u'name': u'AkDe\u011fil Karanl\u0131k\u0130\u015flerinPartisi', u'promoted_content': None, u'events': None}, {u'url': u'http://twitter.com/search?q=Abueva', u'query': u'Abueva', u'name': u'Abueva', u'promoted_content': None, u'events': None}, {u'url': u'http://twitter.com/search?q=%22YesOrNo+PengenTinggian%22', u'query': u'%22YesOrNo+PengenTinggian%22', u'name': u'YesOrNo PengenTinggian', u'promoted_content': None, u'events': None}], u'as_of': u'2014-01-22T13:55:54Z', u'locations': [{u'woeid': 1, u'name': u'Worldwide'}]}]
+-------------------------------------------------------------------------------
+
+Task 1: Find out how WORLD_WOE_IDs are defined by Yahoo and try to use others in a query. What kind of differences do you find between the worldwide trends and the local trends? 
+
+-------------------------------------------------------------------------------
+
+
+Exercise 2.1: Retrieving search results (from Example 1-5/9-3 in Mining the Social Web):
+
+
+=======[START SCRIPT]==========================================================
+
+q = '#MentionSomeoneImportantForYou' # XXX: Set this variable to a trending topic, or anything else you like. 
+count = 100 # number of results to retrieve
+
+# See https://dev.twitter.com/docs/api/1.1/get/search/tweets for more info
+
+search_results = twitter_api.search.tweets(q=q, count=count) # search for your query 'q' 100 times
+statuses = search_results['statuses'] # extract the tweets found
+
+# The following code allows you to print in a nice format the contents of search_results
+import json
+print json.dumps(statuses[0], indent=1) 
+
+=======[END SCRIPT]============================================================
+
+
+
+The start of your output should look like something like this:
+{
+ "contributors": null, 
+ "truncated": false, 
+ "text": "RT @JamesMCallaghan: Love her!!!!   RT @Erin_131: #MentionSomeoneImportantForYou My dad", 
+ "in_reply_to_status_id": null, 
+ "id": 425527242413080576, 
+ "favorite_count": 0, 
+ "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>", 
+ "retweeted": false, 
+ "coordinates": null, 
+ "entities": {
+  "symbols": [], 
+   "user_mentions": [
+   {
+    "id": 43795567, 
+    "indices": [
+     3, 
+     19
+    ], 
+    "id_str": "43795567", 
+    "screen_name": "JamesMCallaghan", 
+    "name": "Jim Callaghan"
+   }, 
+   {
+    "id": 149373154, 
+    "indices": [
+     39, 
+     48
+    ], 
+    "id_str": "149373154", 
+    "screen_name": "Erin_131", 
+    "name": "Erin Callaghan (:"
+   }
+  ], 
+  "hashtags": [
+   {
+    "indices": [
+     50, 
+     80
+    ], 
+    "text": "MentionSomeoneImportantForYou"
+   }
+  ], 
+  "urls": []
+ },
+[...]
+
+-------------------------------------------------------------------------------
+
+Task 2: Create a second variable (e.g., statuses2) that holds the results of a query other than the query you posed in exercise 2.1. Think about a query that would yield very different results than the first one, for example one that may yield shorter tweets or less diverse tweets. 
+
+-------------------------------------------------------------------------------
+
+Simply printing all the search results to screen is nice, but to really start analysing them, it is handy to select interesting parts from the results and store them in a different structure such as a list. 
+
+Exercise 3.1: Extracting text, screen names, and hashtags from tweets (from Example 1-6 in Mining the Social Web):
+
+In this example you are using a thing called "List Comprehension". 
+It is basically a list that consists of lists. In this example, you are creating a variable 'status_texts' of type list. That list will be filled with the 'text' elements from each 'statuses', and 'statuses' comes from looping through all items in the 'search_results' list. 
+Look up the list comprehensions in your Python reference materials to make sure you understand what's happening here. 
+
+
+=======[START SCRIPT]==========================================================
+
+status_texts = [ status['text']
+    for status in statuses ]
+
+screen_names = [ user_mention['screen_name']
+    for status in statuses
+        for user_mention in status['entities']['user_mentions'] ]
+
+hashtags = [ hashtag['text']
+    for status in statuses
+        for hashtag in status['entities']['hashtags'] ]
+
+# Compute a collection of all words from all tweets
+words = [ w
+    for t in status_texts
+        for w in t.split() ] #split the string on the empty spaces
+
+# Explore the first 5 items for each...
+print json.dumps(status_texts[0:5], indent=1)
+print json.dumps(screen_names[0:5], indent=1)
+print json.dumps(hashtags[0:5], indent=1)
+print json.dumps(words[0:5], indent=1)
+
+=======[END SCRIPT]============================================================
+
+
+
+-------------------------------------------------------------------------------
+
+Task 3: Also carry out this exercise for the results you obtained in Task 2. Please remember to not overwrite the variables that you just assigned. 
+
+-------------------------------------------------------------------------------
+
+
+Exercise 3.2: Creating a basic frequency distribution from the words in tweets (from Example 1-7 in Mining the Social Web):
+
+=======[START SCRIPT]==========================================================
+
+from collections import Counter
+for item in [words, screen_names, hashtags]:
+    c = Counter(item)
+
+print c.most_common()[:10] # top 10
+
+=======[END SCRIPT]============================================================
+
+
+Your output should look like this:
+[(u'MentionSomeoneImportantForYou', 97), (u'mentionsomeoneimportantforyou', 1), (u'Perfection', 1)]
+
+-------------------------------------------------------------------------------
+
+Task 4: Also carry out this exercise for the second query that you posed in Task 2. Think about possible explanations for the different results you get from the analyses for the different queries.  
+
+-------------------------------------------------------------------------------
+
+
+So far, we have been storing the data in working memory. Often it's handy to store your data more permanently so you can also return to it in a next session. 
+
+The cPickle module lets you write data to a file in a format that is easily imported again later. 
+
+Exercise 4: Storing data for later use:
+
+=======[START SCRIPT]==========================================================
+
+import cPickle
+f = open("myData.pickle", "wb") # create a file handle for writing (w) in binary mode (b) named myData.pickle, 
+cPickle.dump(words, f) # write the contents of list 'words' to file 'f'
+f.close() #  clean up after yourself
+
+=======[END SCRIPT]============================================================
+
+
+If you browse to your working directory, you should find a file there named "myData.pickle". You can open this in a text editor, or load its contents back into a variable to do some more analyses on. 
+
+=======[START SCRIPT]==========================================================
+
+words=cPickle.load(open("myData.pickle")) # open the myData.pickle file and store its contents into variable 'words' 
+
+=======[END SCRIPT]============================================================
+
+
+
+Exercise 5: Using prettytable to display tuples in a nice tabular format (from Example 1-8 in Mining the Social Web):
+
+=======[START SCRIPT]==========================================================
+
+from prettytable import PrettyTable
+for label, data in (('Word', words),
+        ('Screen Name', screen_names),
+        ('Hashtag', hashtags)):
+    pt = PrettyTable(field_names=[label, 'Count'])
+    c = Counter(data)
+    [ pt.add_row(kv) for kv in c.most_common()[:10] ]
+    pt.align[label], pt.align['Count'] = 'l', 'r' # Set column alignment
+    print pt
+
+=======[END SCRIPT]============================================================
+
+
+Your output should look like this:
++--------------------------------+-------+
+| Word                           | Count |
++--------------------------------+-------+
+| #MentionSomeoneImportantForYou |    97 |
+| RT                             |    78 |
+| @_CollegeHumor_:               |    61 |
+| vodka                          |    61 |
+| “@_CollegeHumor_:              |    13 |
+| vodka”                         |    12 |
+| ♥                              |     7 |
+| @DinaHeshamAlii:               |     4 |
+| 😂😂😂                         |     3 |
+| "@_CollegeHumor_:              |     3 |
++--------------------------------+-------+
+
+
+
+Exercise 6: Calculating lexical diversity for tweets (from Example 1-9 in Mining the Social Web):
+
+=======[START SCRIPT]==========================================================
+
+# Define a function for computing lexical diversity
+def lexical_diversity(tokens): # This is the way to declare user defined functions
+    return 1.0*len(set(tokens))/len(tokens)
+
+# Define a function for computing the average number of words per tweet
+def average_words(statuses):
+    total_words = sum([ len(s.split()) for s in statuses ])
+    return 1.0*total_words/len(statuses) # Prior to Python 3.0, the division operator (/) applies the floor function and returns an integer value (unless one of the operands is a floating-point value). Multiply either the numerator or the denominator by 1.0 to avoid truncation errors.
+
+# Let's use these functions:
+
+print lexical_diversity(words)
+print lexical_diversity(screen_names)
+print lexical_diversity(hashtags)
+print average_words(status_texts)
+
+=======[END SCRIPT]============================================================
+
+
+
+-------------------------------------------------------------------------------
+
+Task 5: What do the printed numbers indicate? Try to explain them.
+
+-------------------------------------------------------------------------------
+
+Exercise 7: Finding the most popular retweets (from Example 1-10 in Mining the Social Web):
+
+=======[START SCRIPT]==========================================================
+
+retweets = [(status['retweet_count'],
+    status['retweeted_status']['user']['screen_name'],
+    status['text'])# Store out a tuple of these three values
+    for status in statuses # for each status
+    if status.has_key('retweeted_status') # ... so long as the status meets this condition.
+    ]
+
+# Slice off the first 5 from the sorted results and display each item in the tuple
+pt = PrettyTable(field_names=['Count', 'Screen Name', 'Text'])
+[ pt.add_row(row) for row in sorted(retweets, reverse=True)[:5] ]
+pt.max_width['Text'] = 50
+pt.align= 'l'
+print pt
+
+=======[END SCRIPT]============================================================
+
+
+Your output should look like this:
++-------+----------------+----------------------------------------------------+
+| Count | Screen Name    | Text                                               |
++-------+----------------+----------------------------------------------------+
+| 82    | _CollegeHumor_ | RT @_CollegeHumor_: #MentionSomeoneImportantForYou |
+|       |                | vodka                                              |
+| 82    | _CollegeHumor_ | RT @_CollegeHumor_: #MentionSomeoneImportantForYou |
+|       |                | vodka                                              |
+| 82    | _CollegeHumor_ | RT @_CollegeHumor_: #MentionSomeoneImportantForYou |
+|       |                | vodka                                              |
+| 82    | _CollegeHumor_ | RT @_CollegeHumor_: #MentionSomeoneImportantForYou |
+|       |                | vodka                                              |
+| 82    | _CollegeHumor_ | RT @_CollegeHumor_: #MentionSomeoneImportantForYou |
+|       |                | vodka                                              |
++-------+----------------+----------------------------------------------------+
+
+
+
+Exercise 8: Looking up users who have retweeted a status (from Example 1-11 in Mining the Social Web):
+
+=======[START SCRIPT]==========================================================
+
+_retweets = twitter_api.statuses.retweets(id=) # Get the original tweet id for a tweet from its retweeted_status node and insert it here
+print [r['user']['screen_name'] for r in _retweets]
+
+=======[END SCRIPT]============================================================
+
+
+-------------------------------------------------------------------------------
+Task 6 (For experienced users):
+If you have a Twitter account with a nontrivial number of tweets, request your historical tweet archive from your account settings and analyze it. The export of your account data includes files organized by time period in a convenient JSON
+format. See the README.txt file included in the downloaded archive for more details. 
+What are the most common terms that appear in your tweets? 
+Who do you  retweet the most often? 
+How many of your tweets are retweeted (and why do you think this is the case)?
+-------------------------------------------------------------------------------
+
+
+
+In the previous exercises we have been looking at the text from the tweets, but when you retrieved the results, you retrieved much more information about the tweets, such as the username of the person who shared this tweet with the world. You can use this information to find out who retweets whom in our examples. 
+
+Exercise 9.1: Plotting frequencies of words (from Example 1-12 in Mining the Social Web):
+
+=======[START SCRIPT]==========================================================
+
+word_counts = sorted(Counter(words).values(), reverse=True)
+import matplotlib.pyplot as plt
+plt.loglog(word_counts)
+plt.ylabel("Freq")
+plt.xlabel("Word Rank")
+plt.show()
+
+=======[END SCRIPT]============================================================
+
+
+Exercise 9.2: Generating histograms of words, screen names, and hashtags (from Example 1-13 in Mining the Social Web):
+
+=======[START SCRIPT]==========================================================
+
+for label, data in (('Words', words), # Build a frequency map for each set of data
+    ('Screen Names', screen_names),
+        ('Hashtags', hashtags)):
+            c = Counter(data)
+
+# plot the values
+plt.hist(c.values())
+
+# Add a title and y-label ...
+plt.title(label)
+plt.ylabel("Number of items in bin")
+plt.xlabel("Bins (number of times an item appeared)")
+plt.show()
+
+=======[END SCRIPT]============================================================
+
+
+Exercise 9.3: Generating a histogram of retweet counts (from Example 1-14 in Mining the Social Web):
+NB: Using underscores while unpacking values in a tuple is idiomatic for discarding them
+
+=======[START SCRIPT]==========================================================
+
+counts = [count for count, _, _ in retweets]
+plt.hist(counts)
+plt.title("Retweets")
+plt.xlabel('Bins (number of times retweeted)')
+plt.ylabel('Number of tweets in bin')
+print counts
+plt.show()
+
+=======[END SCRIPT]============================================================
+
