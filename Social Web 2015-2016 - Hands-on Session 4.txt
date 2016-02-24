@@ -260,71 +260,90 @@ Task 3: Try to follow exactly what is going on in the last call. Notice that Mic
 ----------------------------------------------------------------------------  
 
  
-Exercise 4: Building a del.icio.us Link Recommender (from Programming Collective Intelligence by Toby Segaran)
+Exercise 4: Building a Reddit Recommender (adapted from Programming Collective Intelligence by Toby Segaran)
 
-Install the pydelicious library:
-> easy_install pydelicious
-
-Save the following code as deliciousrec.py
+Save the following code as redditrec.py after you replace the '???' in the user_agent string with your name (or any unique string).
 
 # -*- coding: utf-8 -*-
 
-from pydelicious import get_popular,get_userposts,get_urlposts
+import praw
 import time
 
-def initializeUserDict(tag,count=5):
+r = praw.Reddit(user_agent='Test Script for Social Web course ???')
+
+def initializeUserDict(subreddit, count=10):
   user_dict={}
   # get the top count' popular posts
-  for p1 in get_popular(tag=tag)[0:count]:
-    # find all users who posted this
-    for p2 in get_urlposts(p1['url']):
-      user=p2['user']
-      # do not add when no user id
-      if user:
-        user_dict[user]={}
+  for p1 in r.get_subreddit(subreddit).get_top(limit=count):
+    # find all users who commented in this
+    flat_comments = praw.helpers.flatten_tree(p1.comments)
+    for p2 in flat_comments:
+    	try:
+    		user=p2.author.name
+    		user_dict[user]={}
+    	except AttributeError:
+    		pass
   return user_dict
 
-def fillItems(user_dict):
+def fillItems(user_dict, count=100):
   all_items={}
   # Find links posted by all users
   for user in user_dict:
-    for i in range(3):
-      try:
-        posts=get_userposts(user)
-        break
-      except:
-        print "Failed user "+user+", retrying"
-        time.sleep(4)
-    for post in posts:
-      url=post['url']
-      user_dict[user][url]=1.0
-      all_items[url]=1
+  	# print user
+  	posts = r.get_redditor(user).get_comments(limit = count)
+  	for post in posts:
+  		subreddit = post.subreddit
+  		# print subreddit.display_name
+  		if subreddit.display_name in user_dict[user]:
+  			user_dict[user][subreddit.display_name] += 1.0
+  		else:
+  			user_dict[user][subreddit.display_name] = 1.0
+  		all_items[subreddit.display_name]=1
   
   # Fill in missing items with 0
   for ratings in user_dict.values():
-    for item in all_items:
-      if item not in ratings:
-        ratings[item]=0.0	
+  	for item in all_items:
+  		if item not in ratings:
+  			ratings[item]=0.0
+  		
+  	
+  
+ 
 ----------------------------------------------------------------------------	
 
 
-You can get a list of popular recent posts about programming by invoking:
+You can get a list of popular recent posts about programming from the programming subreddit (https://www.reddit.com/r/programming) by invoking the code below. Don't forget to replace the '???' in the user_agent string with your name (or any unique string).
 
->>> import pydelicious
->>> pydelicious.get_popular(tag='programming')
-[{'count': '', 'extended': '', 'hash': '', 'description': u'How To Write Unmaintainable Code', 'tags': '', 'href': u'http://thc.segfault.net/root/phun/ unmaintain.html', 'user': u'dorsia', 'dt': u'2006-08-19T09:48:56Z'}, {'count': '', 'extended': '', 'hash': '', 'description': u'Threading in C#', 'tags': '', 'href': u'http://www.albahari.com/threading/', 'user': u'mmihale', 'dt': u'2006-05-17T18:09: 24Z'},
-…etc…   # example output
+>>> import praw
+>>> r = praw.Reddit(user_agent='Test Script for Social Web course ???')
+>>> results = r.get_subreddit("programming").get_top(limit=10)
+>>> for r in results:
+>>> 	print r
+2579 :: The Game Boy, a hardware autopsy - Part 1: the CPU
+172 :: x86 Emulator running Windows 98 in the browser (also try Archlinux, Ko...
+176 :: "'The code works' isn’t where you stop; it’s where you start," and mor...
+117 :: How Spotify's Poor API Hygiene Broke a Bunch of Hardware and Software
+77 :: A memory leak mystery and a magic number
+57 :: Introduction to Microcontrollers
+49 :: Screeps, an MMO RTS sandbox game for programmers, is open-sourcing its ...
+46 :: Review: "From Mathematics to Generic Programming" book by Stepanov and ...
+31 :: Trie based routing
+25 :: Inside the Ivy Bridge and Haswell BTB
 
-To automatically create a data set of delicious users similar to the movie watchers you can invoke the initializeUserDict function in deliciousrec.py 
 
->>> from deliciousrec import *
+See here a list of other subreddits you can explore with this code: https://www.reddit.com/reddits/
+
+To automatically create a data set of reddit users similar to the movie watchers you can invoke the initializeUserDict function in redditrec.py
+
+
+>>> from redditrec import *
 >>> delusers=initializeUserDict('programming') # or for any other tag really
 
-Now initializeUserDict has only created the user keys. We of course also want to know what pages they added to their bookmarks. You can pull those in through:
+Now initializeUserDict has only created the user keys. We of course also want to know what subreddits they posted comments on. You can pull those in through:
 
 >>> fillItems(delusers)
 
-When the API blocks requests, your script will pause and retry up to three times for a user. This may take a few minutes. Use this time to review what is going on in the code. Notice that users don't give ratings to delicious bookmarks, there is only a "user has this page" or "user doesn't have this page" which results in a rating of 1 or 0. 
+This script may take a few minutes to collect all the data. Use this time to review what is going on in the code. Notice that users don't give ratings to subreddits, instead we are counting how many comments they posted in each subreddit.  
 
 To recommend a similar user, we can use our first script (recommendations.py) again. 
 
@@ -332,9 +351,13 @@ First choose a random user for whom you're going to find neighbours
 >>> import random
 >>> user=delusers.keys()[random.randint(0,len(delusers)-1)] 
 >>> user # print the username 
-u'veza' # sample output
->> recommendations.topMatches(delusers,user) # from all delicioususers, get the most similar to user
-[(0.083, u'kuzz99'), (0.083, u'arturoochoa'), (0.083, u'NickSmith'), (0.083, u'MichaelDahl'), (0.050, u'zinggoat')] # sample output
+u'CrossFeet' # sample output
+>> recommendations.topMatches(delusers,user) # from all redditors, get the most similar to user
+[(0.5805074906262281, u'borisvassilev'),
+ (0.5799217270906732, u'teiman'),
+ (0.5623054984979032, u'lookmeat'),
+ (0.562202098010025, u'RobIII'),
+ (0.5617842973785171, u'rlt3')] # sample output
 
 ----------------------------------------------------------------------------
 Task 4: Recommend pages for a user based on what similar users have bookmarked. 
