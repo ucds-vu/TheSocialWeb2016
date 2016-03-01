@@ -1,0 +1,132 @@
+﻿******************************************************
+*  The Social Web 2016                              *
+*  Course year 2015-2016                      	    *
+*  Instructors Davide Ceolin, Anca Dumitrache,      *
+*  and Niels Ockeloen 	                            *
+*                                                   *
+*  Exercises for Hands-on session 5		    *
+*  3 Maart 2016 09:00 - 10:45                       *
+*  WN-F153 (W) WN-S345 (W)                          *
+*****************************************************
+
+
+Required Software: 
+- Python 2.7 
+- Python packages: twitter
+
+In this session you are going to learn how to browse user profiles information. As in
+previous exercises, we are going to read the scripts from plain text files. To load
+scripts you type "python <nameofscript.py>" on your command line.
+
+NOTE 1: you need to place all the provided scripts in your working folder.
+NOTE 2: All provided links end with dl=1, which instructs dropbox to offer a direct dowbload of the file. If you rather have the text displayed in the browser, change this to dl=0 before hitting return. The file will then be shown in a lightbox on the dropbox website, allowing you to copy the text.
+NOTE 3: Insted of downloading each script seperatly, you can also download them all at once using the follwing zip file: https://www.dropbox.com/s/d9w1ulin991fse3/scripts_exercises_session_5.zip?dl=1
+
+
+First, download the script for setting up the Twitter API permissions. You can download it here:
+https://www.dropbox.com/s/t4bgfbsc3cmcvqh/twitter_login.py?dl=1
+You need to fill in the empty strings with your credentials. You will need it for all the exercises.
+
+Second, download the script for making robust Twitter requests. You can download it here:
+https://www.dropbox.com/s/ayhjcqwsrdytck6/make_twitter_request.py?dl=1
+
+Exercise 1: Resolving user profile information (from example 9-17 in Mining the Social
+Web).
+
+Many APIs, such as GET friends/ids and GET followers/ids, return opaque ID values that
+need to be resolved to usernames or other profile information for meaningful analysis.
+Twitter provides a GET users/lookup API that can be used to resolve as many as 100 IDs or
+usernames at a time, and a simple pattern can be employed to iterate over larger batches.
+
+Download the script:
+https://www.dropbox.com/s/0tr2j79uouehjwc/get_user_profile.py?dl=1
+You need to run it like this:
+
+>>> from get_user_profile import get_user_profile
+>>> get_user_profile(screen_names=["SocialWebMining", "ptwobrussell"]) #you can substitute the strings with others you like more
+
+
+Exercise 2: Getting all friends or followers for a user (from example 9-19 in Mining the
+Social Web).
+
+Download the script from
+https://www.dropbox.com/s/qdw41d7b83gzsbg/get_friends_followers_ids.py?dl=1
+You need to run it like this:
+
+
+>>> from get_friends_followers_ids import get_friends_followers_ids
+>>> screen_name="SocialWebMining" #you can substitute the strings with others you are more interested in
+>>> friends_ids, followers_ids = get_friends_followers_ids(screen_name=screen_name,friends_limit=10,followers_limit=10)
+>>> print friends_ids
+>>> print followers_ids
+
+
+Exercise 3: Analyzing a user’s friends and followers (from example 9-20 in Mining the
+Social Web).
+
+After harvesting all of a user’s friends and followers, you can conduct some primitive
+analyses using only the ID values themselves with the help of setwise operations such as
+intersection and difference, as shown in the following exercise. Given two sets, the
+intersection of the sets returns the items that they have in common, whereas the
+difference between the sets “subtracts” the items in one set from the other, leaving
+behind the difference. Recall that intersection is a commutative operation, while
+difference is not commutative. 
+
+In the context of analyzing friends and followers, the
+intersection of two sets can be interpreted as “mutual friends” or people you are
+following who are also following you back, while the difference of two sets can be
+interpreted as followers who you aren’t following back or people you are following who
+aren’t following you back, depending on the order of the operands.
+
+Download the script from
+https://www.dropbox.com/s/so3m941u3ores1j/setwise_friends_followers_analysis.py?dl=1
+You need to run it like this:
+
+>>> from get_friends_followers_ids import get_friends_followers_ids 
+>>> from setwise_friends_followers_analysis import setwise_friends_followers_analysis
+>>> screen_name = "ptwobrussell" 
+>>> friends_ids, followers_ids = get_friends_followers_ids(screen_name=screen_name)
+>>> setwise_friends_followers_analysis(screen_name, friends_ids, followers_ids)
+
+ 
+Exercise 4: Harvesting a user’s tweets (from example 9-21 in Mining the Social Web).
+Timelines are a fundamental concept in the Twitter developer ecosystem, and Twitter
+provides a convenient API endpoint for the purpose of harvesting tweets by user through
+the concept of a “user timeline.”
+
+Download the script from
+https://www.dropbox.com/s/vcndxk4rijk9usd/harvest_user_tweets.py?dl=1
+You need to run it like this:
+
+>>> from harvest_user_tweets import harvest_user_timeline
+>>> tweets = harvest_user_timeline(screen_name="SocialWebMining", max_results=200) 
+>>> print tweets
+
+Exercise 5: Analyzing tweet content (from example 9-23 in Mining the Social Web). 
+You will be using simple statistics, such as lexical diversity and average number of words per
+tweet, to gain elementary insight into what is being talked about as a first step in
+sizing up the nature of the language being used. In order to collect tweets, you need to use two additional scripts.
+Download them from:
+https://www.dropbox.com/s/ci1pxy6u0p1yf2y/twitter_search.py?dl=1
+and:
+https://www.dropbox.com/s/b2j9bdp4e3rh50m/extract_tweet_entities.py?dl=1
+and put them in your working folder.
+
+Download the main script from 
+https://www.dropbox.com/s/1qiw2i3uqkuqaee/analyze_tweet.py?dl=1
+You need to run it like this:
+
+>>> from analyze_tweet import analyze_tweet_content 
+>>> from twitter_search import twitter_search 
+>>> q = 'CrossFit' 
+>>> search_results = twitter_search(q) 
+>>> analyze_tweet_content(search_results)
+
+
+----------
+TASK 1: Analyze all of the tweets that you (or another user you are interested in) have ever retweeted. Are you at all surprised about what you have retweeted or how your (or his/her) interests have evolved over time?
+-----------
+
+-----------
+TASK 2: Write a recipe to identify followers that you are not following back but perhaps should follow back based upon the content of their tweets. A few similarity measurements that may make suitable starting points were introduced in Section 3.3.3 on page 112 in the Mining the Social Web.
+-----------
